@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- The Gin, Echo and Fiber modules moved to their own repositories before
+  their first release: [hibira-io/gin](https://github.com/hibira-io/gin),
+  [hibira-io/echo](https://github.com/hibira-io/echo) and
+  [hibira-io/fiber](https://github.com/hibira-io/fiber)
+  (`github.com/hibira-io/gin` and so on).
+
+## v0.2.0
+
 - New core package `github.com/hibira-io/go` (`hibira.Client`): publish
   events (`Trigger`, `Publish`, `TriggerBatch`), channel info (`Channels`,
   `Channel`, `Users`), `TerminateUserConnections`, channel authorization and
@@ -14,10 +22,6 @@
   `useStream()` (`io.Writer`, batching, size limit, final text).
 - New `github.com/hibira-io/go/livechat`: `UserHash` and `Snippet` for Live
   Chat verified visitors.
-- New framework modules, tagged separately: `github.com/hibira-io/go/gin`
-  (Gin), `github.com/hibira-io/go/echo` (Echo v5) and
-  `github.com/hibira-io/go/fiber` (Fiber v3), each with `Auth`, `UserAuth`,
-  `Webhook`, `ApprovalCallback` and `WaitingRoom`.
 
 ## v0.1.0
 
