@@ -1,0 +1,32 @@
+# A published GitHub Release with tag vX.Y.Z (e.g. v0.1.0) is the whole
+# release: the Go module proxy serves the tag. This job checks the tag, runs
+# the tests and asks proxy.golang.org to fetch it, so pkg.go.dev lists it.
+name: release
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tag is vX.Y.Z
+        run: |
+          echo "$GITHUB_REF_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "tag $GITHUB_REF_NAME is not vX.Y.Z"; exit 1; }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "stable"
+      - run: go vet ./...
+      - run: go test -race ./...
+      - name: Fetch through the Go proxy
+        env:
+          GOPROXY: https://proxy.golang.org
+          GOFLAGS: -mod=mod
+        run: |
+          cd "$(mktemp -d)"
+          go mod init check
+          go get "github.com/hibira-io/go@$GITHUB_REF_NAME"
