@@ -9,8 +9,9 @@
 //
 // The net/http handlers (AuthHandler, UserAuthHandler, WebhookHandler) work
 // with the standard library, chi, gorilla/mux and anything else that takes an
-// http.Handler. Gin, Echo and Fiber have their own modules under
-// github.com/hibira-io/go/gin, /echo and /fiber.
+// http.Handler. Gin, Echo and Fiber have their own modules:
+// github.com/hibira-io/gin, github.com/hibira-io/echo and
+// github.com/hibira-io/fiber.
 package hibira
 
 import (

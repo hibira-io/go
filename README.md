@@ -12,7 +12,9 @@ go get github.com/hibira-io/go
 ```
 
 The core module has no dependencies and needs Go 1.21 or later. Gin, Echo
-and Fiber each get a small module of their own, so you only download the
+and Fiber each have a small module in a repository of their own
+([gin](https://github.com/hibira-io/gin), [echo](https://github.com/hibira-io/echo),
+[fiber](https://github.com/hibira-io/fiber)), so you only download the
 framework you use.
 
 | Package | What it does |
@@ -22,9 +24,9 @@ framework you use.
 | [`github.com/hibira-io/go/approvals`](approvals/) | Ask a person for a decision from a server, job or agent with [Hibira Approvals](https://hibira.io/approvals), wait for the answer and verify decision callbacks. |
 | [`github.com/hibira-io/go/waitingroom`](waitingroom/) | Check [waiting room](https://hibira.io/waiting-room) passes and put the queue in front of any `net/http` handler. |
 | [`github.com/hibira-io/go/livechat`](livechat/) | Verified visitors for the [Hibira Live Chat](https://chat.hibira.io) widget. |
-| [`github.com/hibira-io/go/gin`](gin/) | Gin handlers and middleware for all of the above. |
-| [`github.com/hibira-io/go/echo`](echo/) | Echo v5 handlers and middleware. |
-| [`github.com/hibira-io/go/fiber`](fiber/) | Fiber v3 handlers and middleware. |
+| [`github.com/hibira-io/gin`](https://github.com/hibira-io/gin) | Gin handlers and middleware for all of the above. |
+| [`github.com/hibira-io/echo`](https://github.com/hibira-io/echo) | Echo v5 handlers and middleware. |
+| [`github.com/hibira-io/fiber`](https://github.com/hibira-io/fiber) | Fiber v3 handlers and middleware. |
 
 ## Set up
 
@@ -122,9 +124,9 @@ sign without a handler, and make no network call.
 ### Gin, Echo, Fiber
 
 ```go
-import hibiragin "github.com/hibira-io/go/gin"     // go get github.com/hibira-io/go/gin
-import hibiraecho "github.com/hibira-io/go/echo"   // Echo v5
-import hibirafiber "github.com/hibira-io/go/fiber" // Fiber v3
+import hibiragin "github.com/hibira-io/gin"     // go get github.com/hibira-io/gin
+import hibiraecho "github.com/hibira-io/echo"   // Echo v5
+import hibirafiber "github.com/hibira-io/fiber" // Fiber v3
 
 r.POST("/hibira/auth", hibiragin.Auth(client, func(c *gin.Context, channel string) (bool, *hibira.Member) { ... }))
 r.POST("/hibira/user-auth", hibiragin.UserAuth(client, func(c *gin.Context) *hibira.User { ... }))
@@ -237,16 +239,9 @@ unknown app or conversation, 413 the event is over the plan's message size,
 
 ## Releases
 
-| Module | Tag |
-| --- | --- |
-| `github.com/hibira-io/go` | `vX.Y.Z` |
-| `github.com/hibira-io/go/gin` | `gin/vX.Y.Z` |
-| `github.com/hibira-io/go/echo` | `echo/vX.Y.Z` |
-| `github.com/hibira-io/go/fiber` | `fiber/vX.Y.Z` |
-
-Releases are listed under [Releases](https://github.com/hibira-io/go/releases)
-and in [CHANGELOG.md](CHANGELOG.md). When a framework module needs a new core
-version, release the core first.
+Releases are tagged `vX.Y.Z` and listed under
+[Releases](https://github.com/hibira-io/go/releases) and in
+[CHANGELOG.md](CHANGELOG.md). All packages share the module version.
 
 ## Development
 
@@ -254,11 +249,7 @@ version, release the core first.
 gofmt -l .
 go vet ./...
 go test -race ./...
-(cd gin && go test -race ./...)   # echo and fiber need Go 1.25
 ```
-
-The framework modules replace `github.com/hibira-io/go` with `../`, so they
-test against the core in the same commit.
 
 `TestE2E` runs against a real server when `HIBIRA_E2E=1` and the
 `HIBIRA_*` settings point at it, such as a local pusher-server started with
@@ -276,4 +267,4 @@ MIT
 
 Hibira 的 Go 套件都在這個 repo。核心模組 `github.com/hibira-io/go` 沒有外部相依（Go 1.21 以上），提供：發送事件與頻道查詢、私人 / presence 頻道授權與使用者登入（`net/http` handler，標準函式庫、chi、gorilla/mux 皆可用）、webhook 驗證、推播通知、Chat API。子套件 `stream` 把 LLM 的輸出即時串流到頻道，React / Vue 的 `useStream()` 直接接收；`approvals` 請人做決定；`waitingroom` 等候室；`livechat` 產生 Live Chat 已驗證訪客的簽章與 script 標籤。
 
-Gin、Echo（v5）、Fiber（v3）各有獨立的小模組（`/gin`、`/echo`、`/fiber`），提供頻道授權、使用者登入、webhook、Approvals callback 與等候室 middleware，callback 拿到的是框架自己的 context。核心用 `vX.Y.Z` tag 發布，框架模組用 `gin/vX.Y.Z` 這類 tag；框架模組需要新核心時，先發布核心。
+Gin、Echo（v5）、Fiber（v3）各有獨立的 repo 與模組（hibira-io/gin、hibira-io/echo、hibira-io/fiber），提供頻道授權、使用者登入、webhook、Approvals callback 與等候室 middleware，callback 拿到的是框架自己的 context。核心用 `vX.Y.Z` tag 發布；框架模組在各自 repo 發布，需要新核心時先發布核心。
