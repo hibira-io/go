@@ -1,6 +1,12 @@
-# A published GitHub Release with tag vX.Y.Z (e.g. v0.1.0) is the whole
-# release: the Go module proxy serves the tag. This job checks the tag, runs
-# the tests and asks proxy.golang.org to fetch it, so pkg.go.dev lists it.
+# A published GitHub Release is the whole release: the Go module proxy
+# serves the tag. Tags:
+#   vX.Y.Z        github.com/hibira-io/go (core packages)
+#   gin/vX.Y.Z    github.com/hibira-io/go/gin
+#   echo/vX.Y.Z   github.com/hibira-io/go/echo
+#   fiber/vX.Y.Z  github.com/hibira-io/go/fiber
+# Tag the core first when a framework module needs a new core version.
+# This job checks the tag, runs the module's tests and asks
+# proxy.golang.org to fetch it, so pkg.go.dev lists it.
 name: release
 on:
   release:
@@ -13,15 +19,21 @@ jobs:
   go:
     runs-on: ubuntu-latest
     steps:
-      - name: Tag is vX.Y.Z
+      - name: Tag names a module and a version
+        id: tag
         run: |
-          echo "$GITHUB_REF_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "tag $GITHUB_REF_NAME is not vX.Y.Z"; exit 1; }
+          tag="$GITHUB_REF_NAME"
+          echo "$tag" | grep -Eq '^((gin|echo|fiber)/)?v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "tag $tag is not vX.Y.Z or <gin|echo|fiber>/vX.Y.Z"; exit 1; }
+          case "$tag" in
+            */*) dir="${tag%/*}"; echo "dir=$dir" >> "$GITHUB_OUTPUT"; echo "module=github.com/hibira-io/go/$dir" >> "$GITHUB_OUTPUT"; echo "version=${tag#*/}" >> "$GITHUB_OUTPUT" ;;
+            *) echo "dir=." >> "$GITHUB_OUTPUT"; echo "module=github.com/hibira-io/go" >> "$GITHUB_OUTPUT"; echo "version=$tag" >> "$GITHUB_OUTPUT" ;;
+          esac
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: "stable"
-      - run: go vet ./...
-      - run: go test -race ./...
+      - run: go vet ./... && go test -race ./...
+        working-directory: ${{ steps.tag.outputs.dir }}
       - name: Fetch through the Go proxy
         env:
           GOPROXY: https://proxy.golang.org
@@ -29,4 +41,4 @@ jobs:
         run: |
           cd "$(mktemp -d)"
           go mod init check
-          go get "github.com/hibira-io/go@$GITHUB_REF_NAME"
+          go get "${{ steps.tag.outputs.module }}@${{ steps.tag.outputs.version }}"
